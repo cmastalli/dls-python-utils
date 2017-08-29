@@ -39,7 +39,9 @@ fbs = dwl.FloatingBaseSystem()
 wkin = dwl.WholeBodyKinematics()
 wdyn = dwl.WholeBodyDynamics()
 
-
+# set to True if you want to use constant torque limits (independent from the joint configuration)
+# set to False if you want to use the DWS function that computes the max torque limits depending on the joints
+use_urdf_tau_lims = False
 
 # Resetting the robot model
 relative_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -95,20 +97,29 @@ def fun(px, py):
     if wkin.computeJointPosition(q, contact_pos_B, q_nom):
         success = True
         q_branch = fbs.getBranchState(q, 'lf_foot')
-            
-        tau_1 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
+        
+        if use_urdf_tau_lims:
+            tau_1 = np.array([[120.0],[150.0],[150.0]]);
+                                
+            tau_2 = np.array([[120.0],[-150.0],[-150.0]]);
+                                
+            tau_3 = np.array([[120.0],[150.0],[-150.0]]);
+
+            tau_4 = np.array([[120.0],[-150.0],[150.0]]);
+        else:
+            tau_1 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
                                 [robot.getTorqueLimit(1, q_branch[1])],
                                 [robot.getTorqueLimit(2, q_branch[2])]]);
                                 
-        tau_2 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
+            tau_2 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
                                 [-robot.getTorqueLimit(1, q_branch[1])],
                                 [-robot.getTorqueLimit(2, q_branch[2])]]);
                                 
-        tau_3 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
+            tau_3 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
                            [robot.getTorqueLimit(1, q_branch[1])],
                            [-robot.getTorqueLimit(2, q_branch[2])]]);
 
-        tau_4 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
+            tau_4 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
                            [-robot.getTorqueLimit(1, q_branch[1])],
                            [robot.getTorqueLimit(2, q_branch[2])]]);
         
@@ -183,6 +194,8 @@ for i in np.arange(-50.0, 50.0, 2.0):
             fy_3_list.append(force_3[dwl.Y])
             fz_3_list.append(force_3[dwl.Z])
             fx_4_list.append(force_4[dwl.X])
+            fy_4_list.append(force_4[dwl.Y])
+            fz_4_list.append(force_4[dwl.Z])
 
 xv = np.array(x_list)
 
@@ -198,13 +211,13 @@ fz_4 = np.array(fz_4_list)
 
 fig = plt.figure(1)
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(xv, yv, fx_1, color='blue')
-ax.scatter(xv, yv, fx_2, color='red')
-ax.scatter(xv, yv, fx_3, color='yellow')
-ax.scatter(xv, yv, fx_4, color='gray')
+ax.scatter(xv, yv, fz_1, color='blue')
+ax.scatter(xv, yv, fz_2, color='red')
+ax.scatter(xv, yv, fz_3, color='yellow')
+ax.scatter(xv, yv, fz_4, color='gray')
 
 ax.set_xlabel('x[m]')
 ax.set_ylabel('y[m]')
-ax.set_zlabel('f_z [N]')
+ax.set_zlabel('fz[N]')
 
 plt.show()
