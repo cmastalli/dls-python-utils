@@ -203,13 +203,21 @@ def fun(px, py, use_constant_jac, use_urdf_tau_lims):
         force_2 = inv(lf_jac.transpose()).dot(tau_2 - lf_tau_grav)
         force_3 = inv(lf_jac.transpose()).dot(tau_3 - lf_tau_grav)
         force_4 = inv(lf_jac.transpose()).dot(tau_4 - lf_tau_grav)
+        force_5 = inv(lf_jac.transpose()).dot(tau_1 - lf_tau_grav)
+        force_6 = inv(lf_jac.transpose()).dot(tau_2 - lf_tau_grav)
+        force_7 = inv(lf_jac.transpose()).dot(tau_3 - lf_tau_grav)
+        force_8 = inv(lf_jac.transpose()).dot(tau_4 - lf_tau_grav)
     else:
         force_1 = np.array([np.nan, np.nan, np.nan])
         force_2 = np.array([np.nan, np.nan, np.nan])
         force_3 = np.array([np.nan, np.nan, np.nan])
         force_4 = np.array([np.nan, np.nan, np.nan])
+        force_5 = np.array([np.nan, np.nan, np.nan])
+        force_6 = np.array([np.nan, np.nan, np.nan])
+        force_7 = np.array([np.nan, np.nan, np.nan])
+        force_8 = np.array([np.nan, np.nan, np.nan])
 
-    return success, force_1, force_2, force_3, force_4
+    return success, force_1, force_2, force_3, force_4, force_5, force_6, force_7, force_8
 
 
 res = 0.01
@@ -275,30 +283,30 @@ for i in interval_x:
         y_vec[iter_y] = y       
 
         ''' case A) compute GRFs with const jacobian and constant tau limits from urdf'''
-        success, force_1_a, force_2_a, force_3_a, force_4_a = fun(x[0],y[0], True, True)
+        success, force_1_a, force_2_a, force_3_a, force_4_a, force_5_a, force_6_a, force_7_a, force_8_a = fun(x[0],y[0], True, True)
         
         ''' case B) compute GRFs with const jacobian and real tau limits'''
-        success, force_1_b, force_2_b, force_3_b, force_4_b = fun(x[0],y[0], True, False)
+        success, force_1_b, force_2_b, force_3_b, force_4_b, force_5_b, force_6_b, force_7_b, force_8_b = fun(x[0],y[0], True, False)
         
         ''' case C) compute GRFs with real jacobian and real tau limits'''
-        success, force_1_c, force_2_c, force_3_c, force_4_c = fun(x[0],y[0], False, False)
+        success, force_1_c, force_2_c, force_3_c, force_4_c, force_5_c, force_6_c, force_7_c, force_8_c = fun(x[0],y[0], False, False)
         
         ''' case D) compute GRFs with real jacobian and constant tau limits from urdf'''
-        success, force_1, force_2, force_3, force_4 = fun(x[0],y[0], False, True)
+        success, force_1, force_2, force_3, force_4, force_5, force_6, force_7, force_8 = fun(x[0],y[0], False, True)
 #        if success:
         ''' create the lists needed for scattered plotting '''
 #            
-        f_x_a = np.array([force_1_a[dwl.X], force_2_a[dwl.X], force_3_a[dwl.X], force_4_a[dwl.X]])
-        f_y_a = np.array([force_1_a[dwl.Y], force_2_a[dwl.Y], force_3_a[dwl.Y], force_4_a[dwl.Y]])
-        f_z_a = np.array([force_1_a[dwl.Z], force_2_a[dwl.Z], force_3_a[dwl.Z], force_4_a[dwl.Z]])
+        f_x_a = np.array([force_1_a[dwl.X], force_2_a[dwl.X], force_3_a[dwl.X], force_4_a[dwl.X], force_5_a[dwl.X], force_6_a[dwl.X], force_7_a[dwl.X], force_8_a[dwl.X]])
+        f_y_a = np.array([force_1_a[dwl.Y], force_2_a[dwl.Y], force_3_a[dwl.Y], force_4_a[dwl.Y], force_5_a[dwl.Y], force_6_a[dwl.Y], force_7_a[dwl.Y], force_8_a[dwl.Y]])
+        f_z_a = np.array([force_1_a[dwl.Z], force_2_a[dwl.Z], force_3_a[dwl.Z], force_4_a[dwl.Z], force_5_a[dwl.Z], force_6_a[dwl.Z], force_7_a[dwl.Z], force_8_a[dwl.Z]])
         
-        f_x_b = np.array([force_1_b[dwl.X], force_2_b[dwl.X], force_3_b[dwl.X], force_4_b[dwl.X]])
-        f_y_b = np.array([force_1_b[dwl.Y], force_2_b[dwl.Y], force_3_b[dwl.Y], force_4_b[dwl.Y]])
-        f_z_b = np.array([force_1_b[dwl.Z], force_2_b[dwl.Z], force_3_b[dwl.Z], force_4_b[dwl.Z]])
+        f_x_b = np.array([force_1_b[dwl.X], force_2_b[dwl.X], force_3_b[dwl.X], force_4_b[dwl.X], force_5_b[dwl.X], force_6_b[dwl.X], force_7_b[dwl.X], force_8_b[dwl.X]])
+        f_y_b = np.array([force_1_b[dwl.Y], force_2_b[dwl.Y], force_3_b[dwl.Y], force_4_b[dwl.Y], force_5_b[dwl.Y], force_6_b[dwl.Y], force_7_b[dwl.Y], force_8_b[dwl.Y]])
+        f_z_b = np.array([force_1_b[dwl.Z], force_2_b[dwl.Z], force_3_b[dwl.Z], force_4_b[dwl.Z], force_5_b[dwl.Z], force_6_b[dwl.Z], force_7_b[dwl.Z], force_8_b[dwl.Z]])
 
-        f_x_c = np.array([force_1_c[dwl.X], force_2_c[dwl.X], force_3_c[dwl.X], force_4_c[dwl.X]])
-        f_y_c = np.array([force_1_c[dwl.Y], force_2_c[dwl.Y], force_3_c[dwl.Y], force_4_c[dwl.Y]])
-        f_z_c = np.array([force_1_c[dwl.Z], force_2_c[dwl.Z], force_3_c[dwl.Z], force_4_c[dwl.Z]])
+        f_x_c = np.array([force_1_c[dwl.X], force_2_c[dwl.X], force_3_c[dwl.X], force_4_c[dwl.X], force_5_c[dwl.X], force_6_c[dwl.X], force_7_c[dwl.X], force_8_c[dwl.X]])
+        f_y_c = np.array([force_1_c[dwl.Y], force_2_c[dwl.Y], force_3_c[dwl.Y], force_4_c[dwl.Y], force_5_c[dwl.Y], force_6_c[dwl.Y], force_7_c[dwl.Y], force_8_c[dwl.Y]])
+        f_z_c = np.array([force_1_c[dwl.Z], force_2_c[dwl.Z], force_3_c[dwl.Z], force_4_c[dwl.Z], force_5_c[dwl.Z], force_6_c[dwl.Z], force_7_c[dwl.Z], force_8_c[dwl.Z]])
         
         ''' create the matrices needed for surface plotting '''
         ub_z_mat_a[iter_x][iter_y] = np.amax(f_z_a)
@@ -346,12 +354,12 @@ X, Y = np.meshgrid(x_vec, y_vec)
 
 # Plot the surface.
 ''' uncomment here if you want to get a wireframe plot of the collected data '''
-surf = ax.plot_wireframe(Y, X, ub_z_mat_a, rstride=1, cstride=1, color = 'b')
-surf = ax.plot_wireframe(Y, X, lb_z_mat_a, rstride=1, cstride=1, color = 'b')
-surf = ax.plot_wireframe(Y, X, ub_z_mat_b, rstride=1, cstride=1, color = 'r')
-surf = ax.plot_wireframe(Y, X, lb_z_mat_b, rstride=1, cstride=1, color = 'r')
-surf = ax.plot_wireframe(Y, X, ub_z_mat_c, rstride=1, cstride=1, color = 'g')
-surf = ax.plot_wireframe(Y, X, lb_z_mat_c, rstride=1, cstride=1, color = 'g')
+surf = ax.plot_surface(Y, X, ub_z_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_z_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+surf = ax.plot_surface(Y, X, ub_z_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_z_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
+surf = ax.plot_surface(Y, X, ub_z_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_z_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
 ''' uncomment here if you want to get a surface plot of the collected data '''
 #surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
 plt.show()
@@ -369,12 +377,12 @@ X, Y = np.meshgrid(x_vec, y_vec)
 
 # Plot the surface.
 ''' uncomment here if you want to get a wireframe plot of the collected data '''
-surf = ax.plot_wireframe(Y, X, ub_x_mat_a, rstride=1, cstride=1, color = 'b')
-surf = ax.plot_wireframe(Y, X, lb_x_mat_a, rstride=1, cstride=1, color = 'b')
-surf = ax.plot_wireframe(Y, X, ub_x_mat_b, rstride=1, cstride=1, color = 'r')
-surf = ax.plot_wireframe(Y, X, lb_x_mat_b, rstride=1, cstride=1, color = 'r')
-surf = ax.plot_wireframe(Y, X, ub_x_mat_c, rstride=1, cstride=1, color = 'g')
-surf = ax.plot_wireframe(Y, X, lb_x_mat_c, rstride=1, cstride=1, color = 'g')
+surf = ax.plot_surface(Y, X, ub_x_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_x_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+surf = ax.plot_surface(Y, X, ub_x_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_x_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
+surf = ax.plot_surface(Y, X, ub_x_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_x_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
 ''' uncomment here if you want to get a surface plot of the collected data '''
 #surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
 plt.show()
@@ -393,12 +401,12 @@ X, Y = np.meshgrid(x_vec, y_vec)
 
 # Plot the surface.
 ''' uncomment here if you want to get a wireframe plot of the collected data '''
-surf = ax.plot_wireframe(Y, X, ub_y_mat_a, rstride=1, cstride=1, color = 'b')
-surf = ax.plot_wireframe(Y, X, lb_y_mat_a, rstride=1, cstride=1, color = 'b')
-surf = ax.plot_wireframe(Y, X, ub_y_mat_b, rstride=1, cstride=1, color = 'r')
-surf = ax.plot_wireframe(Y, X, lb_y_mat_b, rstride=1, cstride=1, color = 'r')
-surf = ax.plot_wireframe(Y, X, ub_y_mat_c, rstride=1, cstride=1, color = 'g')
-surf = ax.plot_wireframe(Y, X, lb_y_mat_c, rstride=1, cstride=1, color = 'g')
+surf = ax.plot_surface(Y, X, ub_y_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_y_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+surf = ax.plot_surface(Y, X, ub_y_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_y_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
+surf = ax.plot_surface(Y, X, ub_y_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_y_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
 ''' uncomment here if you want to get a surface plot of the collected data '''
 #surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
 plt.show()
