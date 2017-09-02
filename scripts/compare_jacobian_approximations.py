@@ -82,7 +82,7 @@ res_x = 0.01; res_y = 0.01; res_z = 0.002
 #leg_pos_B = dict([])
 scaling_factor = 0.05
 q_haa = [];  q_hfe = [];  q_kfe = [];
-tau_haa_max = []; tau_hfe_max = []; tau_kfe_max = [];
+#tau_haa_max = []; tau_hfe_max = []; tau_kfe_max = [];
 px = []; py = []
 lambda_x = []; lambda_y = []; lambda_z = []
 
@@ -117,6 +117,14 @@ def fun(px, py, use_constant_jac, use_urdf_tau_lims):
             tau_3 = np.array([[120.0],[150.0],[-150.0]]);
 
             tau_4 = np.array([[120.0],[-150.0],[150.0]]);
+
+            tau_5 = np.array([[-120.0],[150.0],[150.0]]);
+                                
+            tau_6 = np.array([[-120.0],[-150.0],[-150.0]]);
+                                
+            tau_7 = np.array([[-120.0],[150.0],[-150.0]]);
+
+            tau_8 = np.array([[-120.0],[-150.0],[150.0]]);
         else:
             tau_1 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
                                 [robot.getTorqueLimit(1, q_branch[1])],
@@ -133,10 +141,26 @@ def fun(px, py, use_constant_jac, use_urdf_tau_lims):
             tau_4 = np.array([[robot.getTorqueLimit(0, q_branch[0])],
                            [-robot.getTorqueLimit(1, q_branch[1])],
                            [robot.getTorqueLimit(2, q_branch[2])]]);
+            
+            tau_5 = np.array([[-robot.getTorqueLimit(0, q_branch[0])],
+                                [robot.getTorqueLimit(1, q_branch[1])],
+                                [robot.getTorqueLimit(2, q_branch[2])]]);
+                                
+            tau_6 = np.array([[-robot.getTorqueLimit(0, q_branch[0])],
+                                [-robot.getTorqueLimit(1, q_branch[1])],
+                                [-robot.getTorqueLimit(2, q_branch[2])]]);
+                                
+            tau_7 = np.array([[-robot.getTorqueLimit(0, q_branch[0])],
+                           [robot.getTorqueLimit(1, q_branch[1])],
+                           [-robot.getTorqueLimit(2, q_branch[2])]]);
+
+            tau_8 = np.array([[-robot.getTorqueLimit(0, q_branch[0])],
+                           [-robot.getTorqueLimit(1, q_branch[1])],
+                           [robot.getTorqueLimit(2, q_branch[2])]]);
         
-        tau_haa_max.append(tau_1[0])
-        tau_hfe_max.append(tau_1[1])
-        tau_kfe_max.append(tau_1[2])
+#        tau_haa_max.append(tau_1[0])
+#        tau_hfe_max.append(tau_1[1])
+#        tau_kfe_max.append(tau_1[2])
 #            print(q_branch.transpose())            
         wrench_grav = np.zeros([6])
         tau_grav = np.zeros([12])
@@ -222,6 +246,20 @@ ub_z_mat_b = np.zeros((len(interval_x), len(interval_y)))
 lb_z_mat_b = np.zeros((len(interval_x), len(interval_y)))
 ub_z_mat_c = np.zeros((len(interval_x), len(interval_y)))
 lb_z_mat_c = np.zeros((len(interval_x), len(interval_y)))
+
+ub_x_mat_a = np.zeros((len(interval_x), len(interval_y)))
+lb_x_mat_a = np.zeros((len(interval_x), len(interval_y)))
+ub_x_mat_b = np.zeros((len(interval_x), len(interval_y)))
+lb_x_mat_b = np.zeros((len(interval_x), len(interval_y)))
+ub_x_mat_c = np.zeros((len(interval_x), len(interval_y)))
+lb_x_mat_c = np.zeros((len(interval_x), len(interval_y)))
+
+ub_y_mat_a = np.zeros((len(interval_x), len(interval_y)))
+lb_y_mat_a = np.zeros((len(interval_x), len(interval_y)))
+ub_y_mat_b = np.zeros((len(interval_x), len(interval_y)))
+lb_y_mat_b = np.zeros((len(interval_x), len(interval_y)))
+ub_y_mat_c = np.zeros((len(interval_x), len(interval_y)))
+lb_y_mat_c = np.zeros((len(interval_x), len(interval_y)))
 x_vec = np.zeros(len(interval_x))
 y_vec = np.zeros(len(interval_y))
 print len(ub_z_mat_a)
@@ -269,6 +307,21 @@ for i in interval_x:
         lb_z_mat_b[iter_x][iter_y] = np.amin(f_z_b)
         ub_z_mat_c[iter_x][iter_y] = np.amax(f_z_c)
         lb_z_mat_c[iter_x][iter_y] = np.amin(f_z_c)
+        
+        ub_x_mat_a[iter_x][iter_y] = np.amax(f_x_a)
+        lb_x_mat_a[iter_x][iter_y] = np.amin(f_x_a)
+        ub_x_mat_b[iter_x][iter_y] = np.amax(f_x_b)
+        lb_x_mat_b[iter_x][iter_y] = np.amin(f_x_b)
+        ub_x_mat_c[iter_x][iter_y] = np.amax(f_x_c)
+        lb_x_mat_c[iter_x][iter_y] = np.amin(f_x_c)
+        
+        ub_y_mat_a[iter_x][iter_y] = np.amax(f_y_a)
+        lb_y_mat_a[iter_x][iter_y] = np.amin(f_y_a)
+        ub_y_mat_b[iter_x][iter_y] = np.amax(f_y_b)
+        lb_y_mat_b[iter_x][iter_y] = np.amin(f_y_b)
+        ub_y_mat_c[iter_x][iter_y] = np.amax(f_y_c)
+        lb_y_mat_c[iter_x][iter_y] = np.amin(f_y_c)        
+        
 #        print iter_x, iter_y
         iter_y = iter_y+1
   
@@ -280,6 +333,7 @@ for i in interval_x:
 xv = np.array(x_list)
 yv = np.array(y_list)
 
+''' Plot FZ '''
 fig = plt.figure(1)
 ax = fig.add_subplot(111, projection='3d')
 
@@ -298,6 +352,53 @@ surf = ax.plot_wireframe(Y, X, ub_z_mat_b, rstride=1, cstride=1, color = 'r')
 surf = ax.plot_wireframe(Y, X, lb_z_mat_b, rstride=1, cstride=1, color = 'r')
 surf = ax.plot_wireframe(Y, X, ub_z_mat_c, rstride=1, cstride=1, color = 'g')
 surf = ax.plot_wireframe(Y, X, lb_z_mat_c, rstride=1, cstride=1, color = 'g')
+''' uncomment here if you want to get a surface plot of the collected data '''
+#surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
+plt.show()
+
+''' Plot FX '''
+fig = plt.figure(2)
+ax = fig.add_subplot(111, projection='3d')
+
+''' uncomment here if you want to get a scattered plot of the collected data '''
+ax.set_xlabel('x[m]')
+ax.set_ylabel('y[m]')
+ax.set_zlabel('fz[N]')
+ax.grid(True)
+X, Y = np.meshgrid(x_vec, y_vec)
+
+# Plot the surface.
+''' uncomment here if you want to get a wireframe plot of the collected data '''
+surf = ax.plot_wireframe(Y, X, ub_x_mat_a, rstride=1, cstride=1, color = 'b')
+surf = ax.plot_wireframe(Y, X, lb_x_mat_a, rstride=1, cstride=1, color = 'b')
+surf = ax.plot_wireframe(Y, X, ub_x_mat_b, rstride=1, cstride=1, color = 'r')
+surf = ax.plot_wireframe(Y, X, lb_x_mat_b, rstride=1, cstride=1, color = 'r')
+surf = ax.plot_wireframe(Y, X, ub_x_mat_c, rstride=1, cstride=1, color = 'g')
+surf = ax.plot_wireframe(Y, X, lb_x_mat_c, rstride=1, cstride=1, color = 'g')
+''' uncomment here if you want to get a surface plot of the collected data '''
+#surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
+plt.show()
+
+
+''' Plot FY '''
+fig = plt.figure(3)
+ax = fig.add_subplot(111, projection='3d')
+
+''' uncomment here if you want to get a scattered plot of the collected data '''
+ax.set_xlabel('x[m]')
+ax.set_ylabel('y[m]')
+ax.set_zlabel('fz[N]')
+ax.grid(True)
+X, Y = np.meshgrid(x_vec, y_vec)
+
+# Plot the surface.
+''' uncomment here if you want to get a wireframe plot of the collected data '''
+surf = ax.plot_wireframe(Y, X, ub_y_mat_a, rstride=1, cstride=1, color = 'b')
+surf = ax.plot_wireframe(Y, X, lb_y_mat_a, rstride=1, cstride=1, color = 'b')
+surf = ax.plot_wireframe(Y, X, ub_y_mat_b, rstride=1, cstride=1, color = 'r')
+surf = ax.plot_wireframe(Y, X, lb_y_mat_b, rstride=1, cstride=1, color = 'r')
+surf = ax.plot_wireframe(Y, X, ub_y_mat_c, rstride=1, cstride=1, color = 'g')
+surf = ax.plot_wireframe(Y, X, lb_y_mat_c, rstride=1, cstride=1, color = 'g')
 ''' uncomment here if you want to get a surface plot of the collected data '''
 #surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
 plt.show()
