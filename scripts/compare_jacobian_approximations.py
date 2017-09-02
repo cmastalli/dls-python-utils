@@ -19,6 +19,9 @@ import random
 import dwl
 from numpy.linalg import inv
 import matplotlib.tri as mtri
+from matplotlib.backends.backend_pdf import PdfPages
+plt.rcParams['text.usetex'] = True
+plt.rcParams['text.latex.unicode'] = True
 
 # dls-python-utils modules
 import os
@@ -222,6 +225,10 @@ def fun(px, py, use_constant_jac, use_urdf_tau_lims):
 
 res = 0.01
 
+''' ****************************************************************************************************** '''
+''' ***************************************** PLOTS AND DATA ANALYSIS ************************************ '''
+''' ****************************************************************************************************** '''
+
 fx_1_list = []
 fy_1_list = []
 fz_1_list = []
@@ -344,12 +351,13 @@ yv = np.array(y_list)
 ''' Plot FZ '''
 fig = plt.figure(1)
 ax = fig.add_subplot(111, projection='3d')
-
 ''' uncomment here if you want to get a scattered plot of the collected data '''
-ax.set_xlabel('x[m]')
-ax.set_ylabel('y[m]')
-ax.set_zlabel('fz[N]')
+ax.set_xlabel(r'$x [m]$',fontsize=16)
+ax.set_ylabel(r'$y [m]$',fontsize=16)
+ax.set_zlabel(r'$F_z [N]$',fontsize=16)
+ax.locator_params(nbins=5, axis='y')
 ax.grid(True)
+ax.set_title(r'contact force limits $F_z$');
 X, Y = np.meshgrid(x_vec, y_vec)
 
 # Plot the surface.
@@ -360,19 +368,19 @@ surf = ax.plot_surface(Y, X, ub_z_mat_b, rstride=1, cstride=1, color = 'r', alph
 surf = ax.plot_surface(Y, X, lb_z_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
 surf = ax.plot_surface(Y, X, ub_z_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
 surf = ax.plot_surface(Y, X, lb_z_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
-''' uncomment here if you want to get a surface plot of the collected data '''
-#surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
+
 plt.show()
 
 ''' Plot FX '''
 fig = plt.figure(2)
 ax = fig.add_subplot(111, projection='3d')
-
 ''' uncomment here if you want to get a scattered plot of the collected data '''
-ax.set_xlabel('x[m]')
-ax.set_ylabel('y[m]')
-ax.set_zlabel('fz[N]')
+ax.set_xlabel(r'$x [m]$',fontsize=16)
+ax.set_ylabel(r'$y [m]$',fontsize=16)
+ax.set_zlabel(r'$F_x [N]$',fontsize=16)
+ax.locator_params(nbins=5, axis='y')
 ax.grid(True)
+ax.set_title(r'contact force limits $F_x$');
 X, Y = np.meshgrid(x_vec, y_vec)
 
 # Plot the surface.
@@ -383,23 +391,23 @@ surf = ax.plot_surface(Y, X, ub_x_mat_b, rstride=1, cstride=1, color = 'r', alph
 surf = ax.plot_surface(Y, X, lb_x_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
 surf = ax.plot_surface(Y, X, ub_x_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
 surf = ax.plot_surface(Y, X, lb_x_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
-''' uncomment here if you want to get a surface plot of the collected data '''
-#surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
 plt.show()
 
 
 ''' Plot FY '''
+#with PdfPages('Fy_lims.pdf') as pdf:
 fig = plt.figure(3)
 ax = fig.add_subplot(111, projection='3d')
-
 ''' uncomment here if you want to get a scattered plot of the collected data '''
-ax.set_xlabel('x[m]')
-ax.set_ylabel('y[m]')
-ax.set_zlabel('fz[N]')
+ax.set_xlabel(r'$x [m]$',fontsize=16)
+ax.set_ylabel(r'$y [m]$',fontsize=16)
+ax.set_zlabel(r'$F_y [N]$',fontsize=16)
+ax.locator_params(nbins=5, axis='y')
 ax.grid(True)
+ax.set_title(r'contact force limits $F_y$');
 X, Y = np.meshgrid(x_vec, y_vec)
 
-# Plot the surface.
+    # Plot the surface.
 ''' uncomment here if you want to get a wireframe plot of the collected data '''
 surf = ax.plot_surface(Y, X, ub_y_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
 surf = ax.plot_surface(Y, X, lb_y_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
@@ -407,6 +415,4 @@ surf = ax.plot_surface(Y, X, ub_y_mat_b, rstride=1, cstride=1, color = 'r', alph
 surf = ax.plot_surface(Y, X, lb_y_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
 surf = ax.plot_surface(Y, X, ub_y_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
 surf = ax.plot_surface(Y, X, lb_y_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
-''' uncomment here if you want to get a surface plot of the collected data '''
-#surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
 plt.show()
