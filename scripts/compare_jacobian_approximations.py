@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Sat Sep  2 16:23:41 2017
+
+@author: user
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Mon Aug 28 12:22:37 2017
 
 @author: user
@@ -39,13 +46,13 @@ ws = dwl.WholeBodyState()
 fbs = dwl.FloatingBaseSystem()
 wkin = dwl.WholeBodyKinematics()
 wdyn = dwl.WholeBodyDynamics()
+#
+#''' set to true if you reset want to make a com'''
+#use_constant_jac = False
 
-''' set to true if you reset want to make a com'''
-use_constant_jac = False
-
-''' set to True if you want to use constant torque limits (independent from the joint configuration)
- set to False if you want to use the DWL function that computes the max torque limits depending on the joints '''
-use_urdf_tau_lims = False
+#''' set to True if you want to use constant torque limits (independent from the joint configuration)
+# set to False if you want to use the DWL function that computes the max torque limits depending on the joints '''
+#use_urdf_tau_lims = False
 
 # Resetting the robot model
 relative_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -87,7 +94,7 @@ q_ubound = np.array([fbs.getUpperLimit(joint_lim['lf_haa_joint']),
                      fbs.getUpperLimit(joint_lim['lf_hfe_joint']),
                      fbs.getUpperLimit(joint_lim['lf_kfe_joint'])])
                      
-def fun(px, py):
+def fun(px, py, use_constant_jac, use_urdf_tau_lims):
     pz = lf_nom[2]
     lf_pos_B = np.array([[px],[py],[pz]])
 
@@ -180,6 +187,7 @@ def fun(px, py):
 
     return success, force_1, force_2, force_3, force_4
 
+
 res = 0.01
 
 fx_1_list = []
@@ -208,11 +216,15 @@ print tmp
 interval_x = np.arange(-50.0, 50.0, 5.0)
 interval_y = np.arange(-50.0, 50.0, 5.0)
 
-ub_z_mat = np.zeros((len(interval_x), len(interval_y)))
-lb_z_mat = np.zeros((len(interval_x), len(interval_y)))
+ub_z_mat_a = np.zeros((len(interval_x), len(interval_y)))
+lb_z_mat_a = np.zeros((len(interval_x), len(interval_y)))
+ub_z_mat_b = np.zeros((len(interval_x), len(interval_y)))
+lb_z_mat_b = np.zeros((len(interval_x), len(interval_y)))
+ub_z_mat_c = np.zeros((len(interval_x), len(interval_y)))
+lb_z_mat_c = np.zeros((len(interval_x), len(interval_y)))
 x_vec = np.zeros(len(interval_x))
 y_vec = np.zeros(len(interval_y))
-print len(ub_z_mat)
+print len(ub_z_mat_a)
 
 iter_x = 0
 iter_y = 0
@@ -223,126 +235,69 @@ for i in interval_x:
         x = i*res+lf_nom[0]
         y = j*res+lf_nom[1]
         y_vec[iter_y] = y       
-#        print x, y
-        success, force_1, force_2, force_3, force_4 = fun(x[0],y[0])
+
+        ''' case A) compute GRFs with const jacobian and constant tau limits from urdf'''
+        success, force_1_a, force_2_a, force_3_a, force_4_a = fun(x[0],y[0], True, True)
+        
+        ''' case B) compute GRFs with const jacobian and real tau limits'''
+        success, force_1_b, force_2_b, force_3_b, force_4_b = fun(x[0],y[0], True, False)
+        
+        ''' case C) compute GRFs with real jacobian and real tau limits'''
+        success, force_1_c, force_2_c, force_3_c, force_4_c = fun(x[0],y[0], False, False)
+        
+        ''' case D) compute GRFs with real jacobian and constant tau limits from urdf'''
+        success, force_1, force_2, force_3, force_4 = fun(x[0],y[0], False, True)
 #        if success:
         ''' create the lists needed for scattered plotting '''
-        x_list.append(x)
-        y_list.append(y)
-        fx_1_list.append(force_1[dwl.X])
-        fy_1_list.append(force_1[dwl.Y])
-        fz_1_list.append(force_1[dwl.Z])
-        fx_2_list.append(force_2[dwl.X])
-        fy_2_list.append(force_2[dwl.Y])
-        fz_2_list.append(force_2[dwl.Z])
-        fx_3_list.append(force_3[dwl.X])
-        fy_3_list.append(force_3[dwl.Y])
-        fz_3_list.append(force_3[dwl.Z])
-        fx_4_list.append(force_4[dwl.X])
-        fy_4_list.append(force_4[dwl.Y])
-        fz_4_list.append(force_4[dwl.Z])
-            
-        f_x = np.array([force_1[dwl.X], force_2[dwl.X], force_3[dwl.X], force_4[dwl.X]])
-        f_y = np.array([force_1[dwl.Y], force_2[dwl.Y], force_3[dwl.Y], force_4[dwl.Y]])
-        f_z = np.array([force_1[dwl.Z], force_2[dwl.Z], force_3[dwl.Z], force_4[dwl.Z]])
-
-        ub_x_list.append(np.amax(f_x))
-        lb_x_list.append(np.amin(f_x))
-        ub_y_list.append(np.amax(f_y))
-        lb_y_list.append(np.amin(f_y))
-        ub_z_list.append(np.amax(f_z))
-        lb_z_list.append(np.amin(f_z))
-        ''' create the matrices needed for surface plotting '''
-        ub_z_mat[iter_x][iter_y] = np.amax(f_z)
-        lb_z_mat[iter_x][iter_y] = np.amin(f_z)
+#            
+        f_x_a = np.array([force_1_a[dwl.X], force_2_a[dwl.X], force_3_a[dwl.X], force_4_a[dwl.X]])
+        f_y_a = np.array([force_1_a[dwl.Y], force_2_a[dwl.Y], force_3_a[dwl.Y], force_4_a[dwl.Y]])
+        f_z_a = np.array([force_1_a[dwl.Z], force_2_a[dwl.Z], force_3_a[dwl.Z], force_4_a[dwl.Z]])
         
-        print iter_x, iter_y
+        f_x_b = np.array([force_1_b[dwl.X], force_2_b[dwl.X], force_3_b[dwl.X], force_4_b[dwl.X]])
+        f_y_b = np.array([force_1_b[dwl.Y], force_2_b[dwl.Y], force_3_b[dwl.Y], force_4_b[dwl.Y]])
+        f_z_b = np.array([force_1_b[dwl.Z], force_2_b[dwl.Z], force_3_b[dwl.Z], force_4_b[dwl.Z]])
+
+        f_x_c = np.array([force_1_c[dwl.X], force_2_c[dwl.X], force_3_c[dwl.X], force_4_c[dwl.X]])
+        f_y_c = np.array([force_1_c[dwl.Y], force_2_c[dwl.Y], force_3_c[dwl.Y], force_4_c[dwl.Y]])
+        f_z_c = np.array([force_1_c[dwl.Z], force_2_c[dwl.Z], force_3_c[dwl.Z], force_4_c[dwl.Z]])
+        
+        ''' create the matrices needed for surface plotting '''
+        ub_z_mat_a[iter_x][iter_y] = np.amax(f_z_a)
+        lb_z_mat_a[iter_x][iter_y] = np.amin(f_z_a)
+        ub_z_mat_b[iter_x][iter_y] = np.amax(f_z_b)
+        lb_z_mat_b[iter_x][iter_y] = np.amin(f_z_b)
+        ub_z_mat_c[iter_x][iter_y] = np.amax(f_z_c)
+        lb_z_mat_c[iter_x][iter_y] = np.amin(f_z_c)
+#        print iter_x, iter_y
         iter_y = iter_y+1
   
     x_vec[iter_x] = x
     iter_x = iter_x+1
     iter_y = 0
 
-#        print ub_z_mat
-        
 
 xv = np.array(x_list)
 yv = np.array(y_list)
-print len(xv), len(yv), len(ub_z_mat)
-fx_1 = np.array(fx_1_list)
-fy_1 = np.array(fy_1_list)
-fz_1 = np.array(fz_1_list) 
-fx_2 = np.array(fx_2_list)
-fy_2 = np.array(fy_2_list)
-fz_2 = np.array(fz_2_list) 
-fx_3 = np.array(fx_3_list)
-fy_3 = np.array(fy_3_list)
-fz_3 = np.array(fz_3_list) 
-fx_4 = np.array(fx_4_list)
-fy_4 = np.array(fy_4_list)
-fz_4 = np.array(fz_4_list)
-ub_x = np.array(ub_x_list) 
-lb_x = np.array(lb_x_list)
-ub_y = np.array(ub_y_list)
-lb_y = np.array(lb_y_list)
-ub_z = np.array(ub_z_list)
-lb_z = np.array(lb_z_list)
 
 fig = plt.figure(1)
 ax = fig.add_subplot(111, projection='3d')
 
 ''' uncomment here if you want to get a scattered plot of the collected data '''
-#ax.scatter(xv, yv, fx_1, color='blue')
-#ax.scatter(xv, yv, fx_2, color='red')
-#ax.scatter(xv, yv, fx_3, color='yellow')
-#ax.scatter(xv, yv, fx_4, color='gray')
-#ax.scatter(xv, yv, ub_z, color='green')
-#ax.scatter(xv, yv, lb_z, color='green')
-#print len(xv), len(yv)
-#ax.set_xlabel('x[m]')
-#ax.set_ylabel('y[m]')
-#ax.set_zlabel('fz[N]')
-#ax.grid(True)
-#
-#plt.show()
-
-#n_radii = 8
-#n_angles = 36
-#
-## Make radii and angles spaces (radius r=0 omitted to eliminate duplication).
-#radii = np.linspace(0.125, 1.0, n_radii)
-#angles = np.linspace(0, 2*np.pi, n_angles, endpoint=False)
-#
-## Repeat all angles for each radius.
-#angles = np.repeat(angles[..., np.newaxis], n_radii, axis=1)
-#
-## Convert polar (radii, angles) coords to cartesian (x, y) coords.
-## (0, 0) is manually added at this stage,  so there will be no duplicate
-## points in the (x, y) plane.
-#x = np.append(0, (radii*np.cos(angles)).flatten())
-#y = np.append(0, (radii*np.sin(angles)).flatten())
-#
-## Compute z to make the pringle surface.
-#z = np.sin(-x*y)
-##print z
-#print len(x), len(y), len(z)
-#fig = plt.figure()
-#ax = fig.gca(projection='3d')
-#ax.plot_trisurf(interval_x, interval_y, z, linewidth=0.2, antialiased=True)
-#
-#plt.show()
-
-#fig = plt.figure()
-#ax = fig.gca(projection='3d')
+ax.set_xlabel('x[m]')
+ax.set_ylabel('y[m]')
+ax.set_zlabel('fz[N]')
+ax.grid(True)
 X, Y = np.meshgrid(x_vec, y_vec)
-##R = np.sqrt(X**2 + Y**2)
-Z = ub_z_mat
 
 # Plot the surface.
 ''' uncomment here if you want to get a wireframe plot of the collected data '''
-surf = ax.plot_wireframe(Y, X, ub_z_mat, rstride=1, cstride=1)
-surf = ax.plot_wireframe(Y, X, lb_z_mat, rstride=1, cstride=1)
+surf = ax.plot_wireframe(Y, X, ub_z_mat_a, rstride=1, cstride=1, color = 'b')
+surf = ax.plot_wireframe(Y, X, lb_z_mat_a, rstride=1, cstride=1, color = 'b')
+surf = ax.plot_wireframe(Y, X, ub_z_mat_b, rstride=1, cstride=1, color = 'r')
+surf = ax.plot_wireframe(Y, X, lb_z_mat_b, rstride=1, cstride=1, color = 'r')
+surf = ax.plot_wireframe(Y, X, ub_z_mat_c, rstride=1, cstride=1, color = 'g')
+surf = ax.plot_wireframe(Y, X, lb_z_mat_c, rstride=1, cstride=1, color = 'g')
 ''' uncomment here if you want to get a surface plot of the collected data '''
 #surf = ax.plot_surface(Y, X, Z, rstride=1, cstride=1)
 plt.show()
-
