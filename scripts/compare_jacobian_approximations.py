@@ -20,6 +20,7 @@ import dwl
 from numpy.linalg import inv
 import matplotlib.tri as mtri
 from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib as mpl
 plt.rcParams['text.usetex'] = True
 plt.rcParams['text.latex.unicode'] = True
 
@@ -352,22 +353,27 @@ yv = np.array(y_list)
 fig = plt.figure(1)
 ax = fig.add_subplot(111, projection='3d')
 ''' uncomment here if you want to get a scattered plot of the collected data '''
-ax.set_xlabel(r'$x [m]$',fontsize=16)
-ax.set_ylabel(r'$y [m]$',fontsize=16)
-ax.set_zlabel(r'$F_z [N]$',fontsize=16)
+ax.set_xlabel(r'$x [m]$',fontsize=40)
+ax.set_ylabel(r'$y [m]$',fontsize=40)
+ax.set_zlabel(r'$F_z [N]$',fontsize=40)
 ax.locator_params(nbins=5, axis='y')
+ax.tick_params(labelsize=25)
 ax.grid(True)
-ax.set_title(r'contact force limits $F_z$');
+ax.set_title(r'contact force limits $F_z$',fontsize=40);
 X, Y = np.meshgrid(x_vec, y_vec)
 
 # Plot the surface.
 ''' uncomment here if you want to get a wireframe plot of the collected data '''
-surf = ax.plot_surface(Y, X, ub_z_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
-surf = ax.plot_surface(Y, X, lb_z_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
-surf = ax.plot_surface(Y, X, ub_z_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
-surf = ax.plot_surface(Y, X, lb_z_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
-surf = ax.plot_surface(Y, X, ub_z_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
-surf = ax.plot_surface(Y, X, lb_z_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
+#surf = ax.plot_surface(Y, X, ub_z_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+#surf = ax.plot_surface(Y, X, lb_z_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+surf = ax.plot_surface(Y, X, ub_z_mat_b, rstride=1, cstride=1, color = 'r', label = 'a', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_z_mat_b, rstride=1, cstride=1, color = 'r', label = 'a', alpha = 0.3)
+surf = ax.plot_surface(Y, X, ub_z_mat_c, rstride=1, cstride=1, color = 'g', label = 'a', alpha = 0.3)
+surf = ax.plot_surface(Y, X, lb_z_mat_c, rstride=1, cstride=1, color = 'g', label = 'a', alpha = 0.3)
+# Now add the legend with some customizations.
+fake2Dline1 = mpl.lines.Line2D([0],[0], linestyle="none", c='g', marker = 'o')
+fake2Dline2 = mpl.lines.Line2D([0],[0], linestyle="none", c='r', marker = 'o')
+ax.legend([fake2Dline1,fake2Dline2], ['real limits','constant jacobian approximation'], numpoints = 1,fontsize=20)
 
 plt.show()
 
@@ -375,22 +381,26 @@ plt.show()
 fig = plt.figure(2)
 ax = fig.add_subplot(111, projection='3d')
 ''' uncomment here if you want to get a scattered plot of the collected data '''
-ax.set_xlabel(r'$x [m]$',fontsize=16)
-ax.set_ylabel(r'$y [m]$',fontsize=16)
-ax.set_zlabel(r'$F_x [N]$',fontsize=16)
+ax.set_xlabel(r'$x [m]$',fontsize=40)
+ax.set_ylabel(r'$y [m]$',fontsize=40)
+ax.set_zlabel(r'$F_x [N]$',fontsize=40)
 ax.locator_params(nbins=5, axis='y')
+ax.tick_params(labelsize=25)
 ax.grid(True)
-ax.set_title(r'contact force limits $F_x$');
+ax.set_title(r'contact force limits $F_x$',fontsize=40);
 X, Y = np.meshgrid(x_vec, y_vec)
 
 # Plot the surface.
 ''' uncomment here if you want to get a wireframe plot of the collected data '''
-surf = ax.plot_surface(Y, X, ub_x_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
-surf = ax.plot_surface(Y, X, lb_x_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+#surf = ax.plot_surface(Y, X, ub_x_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+#surf = ax.plot_surface(Y, X, lb_x_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
 surf = ax.plot_surface(Y, X, ub_x_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
 surf = ax.plot_surface(Y, X, lb_x_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
 surf = ax.plot_surface(Y, X, ub_x_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
 surf = ax.plot_surface(Y, X, lb_x_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
+fake2Dline1 = mpl.lines.Line2D([0],[0], linestyle="none", c='g', marker = 'o')
+fake2Dline2 = mpl.lines.Line2D([0],[0], linestyle="none", c='r', marker = 'o')
+ax.legend([fake2Dline1,fake2Dline2], ['real limits','constant jacobian approximation'], numpoints = 1,fontsize=20)
 plt.show()
 
 
@@ -399,20 +409,24 @@ plt.show()
 fig = plt.figure(3)
 ax = fig.add_subplot(111, projection='3d')
 ''' uncomment here if you want to get a scattered plot of the collected data '''
-ax.set_xlabel(r'$x [m]$',fontsize=16)
-ax.set_ylabel(r'$y [m]$',fontsize=16)
-ax.set_zlabel(r'$F_y [N]$',fontsize=16)
+ax.set_xlabel(r'$x [m]$',fontsize=40)
+ax.set_ylabel(r'$y [m]$',fontsize=40)
+ax.set_zlabel(r'$F_y [N]$',fontsize=40)
 ax.locator_params(nbins=5, axis='y')
+ax.tick_params(labelsize=25)
 ax.grid(True)
-ax.set_title(r'contact force limits $F_y$');
+ax.set_title(r'contact force limits $F_y$',fontsize=40);
 X, Y = np.meshgrid(x_vec, y_vec)
 
     # Plot the surface.
 ''' uncomment here if you want to get a wireframe plot of the collected data '''
-surf = ax.plot_surface(Y, X, ub_y_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
-surf = ax.plot_surface(Y, X, lb_y_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+#surf = ax.plot_surface(Y, X, ub_y_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
+#surf = ax.plot_surface(Y, X, lb_y_mat_a, rstride=1, cstride=1, color = 'b', alpha = 0.3)
 surf = ax.plot_surface(Y, X, ub_y_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
 surf = ax.plot_surface(Y, X, lb_y_mat_b, rstride=1, cstride=1, color = 'r', alpha = 0.3)
 surf = ax.plot_surface(Y, X, ub_y_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
 surf = ax.plot_surface(Y, X, lb_y_mat_c, rstride=1, cstride=1, color = 'g', alpha = 0.3)
+fake2Dline1 = mpl.lines.Line2D([0],[0], linestyle="none", c='g', marker = 'o')
+fake2Dline2 = mpl.lines.Line2D([0],[0], linestyle="none", c='r', marker = 'o')
+ax.legend([fake2Dline1,fake2Dline2], ['real limits','constant jacobian approximation'], numpoints = 1,fontsize=20)
 plt.show()
