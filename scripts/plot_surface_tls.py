@@ -40,9 +40,12 @@ fbs = dwl.FloatingBaseSystem()
 wkin = dwl.WholeBodyKinematics()
 wdyn = dwl.WholeBodyDynamics()
 
-# set to True if you want to use constant torque limits (independent from the joint configuration)
-# set to False if you want to use the DWS function that computes the max torque limits depending on the joints
-use_urdf_tau_lims = True
+''' set to true if you reset want to make a com'''
+use_constant_jac = False
+
+''' set to True if you want to use constant torque limits (independent from the joint configuration)
+ set to False if you want to use the DWL function that computes the max torque limits depending on the joints '''
+use_urdf_tau_lims = False
 
 # Resetting the robot model
 relative_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -141,15 +144,30 @@ def fun(px, py):
                                         no_grf);
         lf_tau_grav = fbs.getBranchState(tau_grav, 'lf_foot')
 
-        jac = np.zeros([3 * fbs.getNumberOfEndEffectors(dwl.FOOT), 6 + fbs.getJointDoF()])
-        fixed_jac = np.zeros([3 * fbs.getNumberOfEndEffectors(dwl.FOOT), fbs.getJointDoF()])
-        wkin.computeJacobian(jac,
+        ''' set to true if you want to use a constant jacobian'''
+        if use_constant_jac:
+#            q_nom = fbs.getDefaultPosture()
+            q_defult_lf = fbs.getBranchState(q_nom, 'lf_foot')
+            jac = np.zeros([3 * fbs.getNumberOfEndEffectors(dwl.FOOT), 6 + fbs.getJointDoF()])
+            fixed_jac = np.zeros([3 * fbs.getNumberOfEndEffectors(dwl.FOOT), fbs.getJointDoF()])
+            wkin.computeJacobian(jac,
+                                 np.zeros(6), q_nom,
+                                 fbs.getEndEffectorNames(dwl.FOOT),
+                                 dwl.Linear)
+
+            wkin.getFixedBaseJacobian(fixed_jac, jac)
+            lf_jac = fixed_jac[0:3,0:3]
+        else:
+            jac = np.zeros([3 * fbs.getNumberOfEndEffectors(dwl.FOOT), 6 + fbs.getJointDoF()])
+            fixed_jac = np.zeros([3 * fbs.getNumberOfEndEffectors(dwl.FOOT), fbs.getJointDoF()])
+            wkin.computeJacobian(jac,
                                  np.zeros(6), q,
                                  fbs.getEndEffectorNames(dwl.FOOT),
                                  dwl.Linear)
 
-        wkin.getFixedBaseJacobian(fixed_jac, jac)
-        lf_jac = fixed_jac[0:3,0:3]
+            wkin.getFixedBaseJacobian(fixed_jac, jac)
+            lf_jac = fixed_jac[0:3,0:3]
+
         force_1 = inv(lf_jac.transpose()).dot(tau_1 - 0*lf_tau_grav)
         force_2 = inv(lf_jac.transpose()).dot(tau_2 - 0*lf_tau_grav)
         force_3 = inv(lf_jac.transpose()).dot(tau_3 - 0*lf_tau_grav)
