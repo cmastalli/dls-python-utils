@@ -41,7 +41,7 @@ time = array_utils.getTimeArray(ws_vec)
 joint_vel = array_utils.getJointVelocityArray(ws_vec)
 joint_eff = array_utils.getJointEffortArray(ws_vec)
 
-energy = 0.
+power = 0.
 for i in range(len(joint_eff)):
     for j in range(len(joint_eff[i])):
         dt = 0.
@@ -49,10 +49,10 @@ for i in range(len(joint_eff)):
             t0 = time[j-1][0]
             tf = time[j][0]
             dt = tf - t0
-        energy += joint_eff[i][j] * joint_vel[i][j] * dt
+        power += joint_eff[i][j] * joint_vel[i][j] * dt
 weight = fbs.getGravityAcceleration() * fbs.getTotalMass()
 travel_distance = np.linalg.norm(ws_vec[-1].getBasePosition_W() - ws_vec[0].getBasePosition_W())
 
-print('The mechanical CoT is:', energy[0] / (weight * travel_distance))
+print('The mechanical CoT is:', power[0] / (weight * travel_distance))
 
 
