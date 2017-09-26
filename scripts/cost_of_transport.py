@@ -21,6 +21,28 @@ import matplotlib.pyplot as plt
 
 dwl_path = '/home/cmastalli/dls_ws/src/dls/dwl-distro/dwl/'
 topic = '/hyq/robot_states'
+########################### ICRA-15
+# gap25cm
+initial_time = 6.9
+duration = 16
+bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/gap25cm/2017-09-26-17-31-47.bag'
+
+# stepping stones
+initial_time = 5
+duration = 37
+bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/stepping_stones/2017-09-26-17-25-06.bag'
+
+# stairs
+initial_time = 27.5
+duration = 14.5
+bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/stairs/2017-09-26-17-23-05.bag'
+
+# pallet
+initial_time = 5.6
+duration = 0
+bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/pallet/2017-09-26-17-41-25.bag'
+
+
 ########################### ICRA-17
 # gap25cm
 #initial_time = 39
@@ -45,19 +67,19 @@ topic = '/hyq/robot_states'
 
 ######################### RAL-18
 # Two slopes: walk
-initial_time = 15
-duration = 19
-bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ral18icra/two_slopes/2017-08-04-11-38-33.bag'
-
+#initial_time = 15
+#duration = 19
+#bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ral18icra/two_slopes/2017-08-04-11-38-33.bag'
+#
 # Two slopes: trot
-initial_time = 14.3
-duration = 7
-bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ral18icra/two_slopes_trot/2017-08-04-11-58-10.bag'
+#initial_time = 14.3
+#duration = 7
+#bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ral18icra/two_slopes_trot/2017-08-04-11-58-10.bag'
 
 # Two slopes: trans
-initial_time = 15.4
-duration = 10
-bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ral18icra/two_slopes_trans/exp1/2017-08-04-15-36-06.bag'
+#initial_time = 15.4
+#duration = 10
+#bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ral18icra/two_slopes_trans/exp1/2017-08-04-15-36-06.bag'
 
 #initial_time = 14.314 + 15
 #duration = 5 #25.
