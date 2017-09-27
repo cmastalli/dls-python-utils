@@ -23,20 +23,20 @@ dwl_path = '/home/cmastalli/dls_ws/src/dls/dwl-distro/dwl/'
 topic = '/hyq/robot_states'
 ########################### ICRA-15
 # gap25cm
-initial_time = 6.9
-duration = 16
-bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/gap25cm/2017-09-26-17-31-47.bag'
+#initial_time = 6.9
+#duration = 16.5
+#bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/gap25cm/2017-09-26-17-31-47.bag'
 
 # stepping stones
-initial_time = 5
-duration = 37
-bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/stepping_stones/2017-09-26-17-25-06.bag'
-
+#initial_time = 5
+#duration = 37
+#bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/stepping_stones/2017-09-26-17-25-06.bag'
+#
 # stairs
 initial_time = 27.5
-duration = 14.5
+duration = 15.5
 bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/stairs/2017-09-26-17-23-05.bag'
-
+#
 # pallet
 initial_time = 5.6
 duration = 0
@@ -45,8 +45,8 @@ bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/ijrr18/decoupled/palle
 
 ########################### ICRA-17
 # gap25cm
-#initial_time = 39
-#duration = 14
+#initial_time = 39.8
+#duration = 13.1
 #bag_file = '/media/cmastalli/Maxtor/Documents/Experiments/icra17/gap25cm/9/2016-10-06-13-04-07_modified.bag'
 #
 ## gap15cm
@@ -105,11 +105,15 @@ ws_vec = bag_parser.extractWholeBodyState(bag_file,
 
 # Getting the time, joint torque and velocity vectors   
 time = array_utils.getTimeArray(ws_vec)
+base_vel = array_utils.getBaseVelocityArray(ws_vec)
 joint_vel = array_utils.getJointVelocityArray(ws_vec)
 joint_eff = array_utils.getJointEffortArray(ws_vec)
 
 # Computing the total energy
 total_energy = 0.
+average_vel_x = 0.
+average_vel_y = 0.
+average_vel_z = 0.
 power = [0.] * len(joint_eff[0])
 for i in range(len(joint_eff)):
     for j in range(len(joint_eff[i])):
@@ -121,15 +125,28 @@ for i in range(len(joint_eff)):
         actual_power = joint_eff[i][j] * joint_vel[i][j]
         power[j] += actual_power
         total_energy += math.fabs(actual_power * dt)
-        
+
+print len(base_vel[2])
+for i in range(len(base_vel[0])):
+    average_vel_x += base_vel[dwl.X][i][0]
+    average_vel_y += base_vel[dwl.Y][i][0]
+    average_vel_z += base_vel[dwl.Z][i][0]
+
+average_vel_x /= len(base_vel[0])
+average_vel_y /= len(base_vel[0])
+average_vel_z /= len(base_vel[0])
+average_vel = math.sqrt(math.pow(average_vel_x,2)+math.pow(average_vel_y,2)+math.pow(average_vel_z,2))
+
 
 # Computing the weight of the robot and the travel distance
 weight = fbs.getGravityAcceleration() * fbs.getTotalMass()
 travel_distance = np.linalg.norm(ws_vec[-1].getBasePosition_W() - ws_vec[0].getBasePosition_W())
 
 # Computing the CoT
+print('The travel distance is:', travel_distance)
 print('The mechanical CoT is:', total_energy / (weight * travel_distance))
-
+print('The average base velocity is:', average_vel)
+print('The mechanical CoT / average velocity is:', total_energy / (weight * travel_distance * average_vel))
 
 # Plotting the power
 fig, ax = plt.subplots(nrows=1, sharex=True)
